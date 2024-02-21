@@ -19,63 +19,12 @@ export const rootRenderer = jsxRenderer(({ children }) => {
         <script src="https://cdn.tailwindcss.com"></script>
         <title>pseudo hono htmx</title>
       </head>
-      <body>
+      <body id="body">
           ${children}
       </body>
     </html>
   `
 })
-
-export const mainRenderer = jsxRenderer(({ children, Layout }) => {
-            const c = useRequestContext();
-            if(c.req.path.startsWith('/admin')) {
-                return (<Layout>{children}</Layout>)
-            }
-            return (
-                <Layout>
-                    <div>
-                        <nav>
-                            <ul hx-boost="true" hx-target="#main-area">
-                                <li><a href="/">home</a></li>
-                                <li><a href="/page1">page1</a></li>
-                                <li><a href="/page2">page2</a></li>
-                                <li><a href="/login">Login</a></li>
-                            </ul>
-                        </nav>
-                        <div class="mt-5" id="main-area">
-                            {children}
-                        </div>
-                    </div>
-                </Layout>
-            )})
-
-
-    export const adminMainRenderer = jsxRenderer(({ children, Layout }) => {
-        const c = useRequestContext();
-        console.log('admin layout', c.req.raw.headers)
-        if(c.req.raw.headers.has('hx-request')) {
-            return (<>{children}</>)
-        }
-        return (
-            <Layout>
-                <div>
-                    <h1>Admin</h1>
-                    <nav>
-                        <ul hx-boost="true" hx-target="#main-area">
-                            <li><a href="/admin">admin home</a></li>
-                            <li><a href="/admin/page1">admin page1</a></li>
-                            <li><a href="/admin/page2">admin page2</a></li>
-                            <li><a href="/admin/logout">Logout</a></li>
-                        </ul>
-                    </nav>
-                    <div class="mt-5" id="main-area">
-                        {children}
-                    </div>
-                </div>
-            </Layout>
-        )}, {
-            docType: false
-        })
 
 export const LoginRoute = () => {
     return (
@@ -87,7 +36,7 @@ export const LoginRoute = () => {
 const LoginForm = ({message} : {message?:string}) => {
     return (
         <>
-        <form action="/login" method="POST" hx-post="/login" hx-target="this" hx-swap="outerHTML">
+        <form method="POST" hx-post="/auth/login" hx-target="this" hx-swap="outerHTML">
         {message && (<p>message: {message}</p>)}
             <input  type="text" name="username" id="username" placeholder='username' />
             <button type='submit'>Login</button>
@@ -116,7 +65,7 @@ export const PostLogin = async ({c} : {c:Context<MyEnv, string, BlankInput>}) =>
             c.header('HX-Location', '{"path":"/admin/2"}');
             return c.html(<></>)
         }
-        return c.html(<LoginForm message={"Could not login"} />)
+        return c.render(<LoginForm message={"Could not login"} />)
     }
 
     if(username === "admin")
