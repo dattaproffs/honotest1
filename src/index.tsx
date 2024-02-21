@@ -53,13 +53,15 @@ app.get('/login', (c) => {
 	)
 })
 app.post('/login', async (c) => {
+	//return c.redirect('/admin/2')
 	return await PostLogin({c})
 })
 
 const adminApp = new Hono()
 adminApp.use('*', adminMainRenderer)
 adminApp.get('/', (c) => {
-	if (c.req.raw.headers.has('hx-request')) {
+	console.log('admin/', c.req)
+	if (c.req.raw.headers.has('hx-requestt')) {
 		return c.html(
 			<div>
 				<h3>Hello admin</h3>
@@ -82,6 +84,35 @@ adminApp.get('/2', (c) => {
 			<h3>Hello admin</h3>
 			<a href="/test" hx-get="/test" hx-target="#todo">test</a>
 			<div id="todo"></div>
+		</div>
+	)
+})
+
+adminApp.get('/page1', (c) => {
+	if (c.req.raw.headers.has('hx-requestt')){
+		return c.html(
+			<div>
+				<h3>PAge 1</h3>
+			</div>
+		)
+	}
+	return c.render(
+		<div>
+			<h3>PAge 1</h3>
+		</div>
+	)
+})
+adminApp.get('/page2', (c) => {
+	if (c.req.raw.headers.has('hx-requestt')){
+		return c.html(
+			<div>
+				<h3>PAge 2</h3>
+			</div>
+		)
+	}
+	return c.render(
+		<div>
+			<h3>PAge 2</h3>
 		</div>
 	)
 })

@@ -27,6 +27,10 @@ export const rootRenderer = jsxRenderer(({ children }) => {
 })
 
 export const mainRenderer = jsxRenderer(({ children, Layout }) => {
+            const c = useRequestContext();
+            if(c.req.path.startsWith('/admin')) {
+                return (<Layout>{children}</Layout>)
+            }
             return (
                 <Layout>
                     <div>
@@ -47,6 +51,11 @@ export const mainRenderer = jsxRenderer(({ children, Layout }) => {
 
 
     export const adminMainRenderer = jsxRenderer(({ children, Layout }) => {
+        const c = useRequestContext();
+        console.log('admin layout', c.req.raw.headers)
+        if(c.req.raw.headers.has('hx-request')) {
+            return (<>{children}</>)
+        }
         return (
             <Layout>
                 <div>
@@ -64,7 +73,9 @@ export const mainRenderer = jsxRenderer(({ children, Layout }) => {
                     </div>
                 </div>
             </Layout>
-        )})
+        )}, {
+            docType: false
+        })
 
 export const LoginRoute = () => {
     return (
@@ -90,11 +101,30 @@ export const PostLogin = async ({c} : {c:Context<MyEnv, string, BlankInput>}) =>
     const hasHtmx = c.req.raw.headers.has('hx-request')
     const formData = await c.req.formData();
     const username = formData.get('username');
+    console.log('username', username)
+    if(hasHtmx) {
+        console.log('hasHtmx')
+        if(username === "admin") {
+            c.header('HX-Location', '{"path":"/admin"}') 
+            return c.html(<></>)
+        }
+        if(username === "admin2") {
+            c.header('HX-Location', '{"path":"/admin/2"}') 
+            return c.html(<></>)
+        }
+        if(username === "admin3") {
+            c.header('HX-Location', '{"path":"/admin/2"}');
+            return c.html(<></>)
+        }
+        return c.html(<LoginForm message={"Could not login"} />)
+    }
+
     if(username === "admin")
         return c.redirect('/admin')
     if(username === "admin2")
         return c.redirect('/admin/2')
-    if(hasHtmx)
-        return c.html(<LoginForm message={"Could not login"} />)
+    if(username === "admin3") {
+        return c.redirect('/admin/2')
+    }
     return c.render(<LoginForm message={"Could not login"} />)
 }
