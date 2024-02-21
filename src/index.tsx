@@ -8,6 +8,10 @@ import authApp from './routes/auth';
 
 const app = new Hono<MyEnv>()
 
+app.use(async (c, next) => {
+	c.set('frontend', c.req.raw.headers.has('hx-request'))
+	await next()
+})
 app.use('*', rootRenderer);
 
 

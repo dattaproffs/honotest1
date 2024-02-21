@@ -4,7 +4,9 @@ import { jsxRenderer, useRequestContext } from 'hono/jsx-renderer'
 import type { BlankInput, MiddlewareHandler } from 'hono/types'
 
 export type MyEnv = {
-	Variables: {},
+	Variables: {
+        frontend: boolean
+    },
 	Bindings: {
 		TEST: string
 	}
@@ -47,12 +49,10 @@ const LoginForm = ({message} : {message?:string}) => {
 
 export const PostLogin = async ({c} : {c:Context<MyEnv, string, BlankInput>}) => {
     //const c = useRequestContext<MyEnv>();
-    const hasHtmx = c.req.raw.headers.has('hx-request')
     const formData = await c.req.formData();
     const username = formData.get('username');
     console.log('username', username)
-    if(hasHtmx) {
-        console.log('hasHtmx')
+    if(c.var.frontend) {
         if(username === "admin") {
             c.header('HX-Location', '{"path":"/admin"}') 
             return c.html(<></>)

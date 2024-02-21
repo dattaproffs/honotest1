@@ -24,6 +24,7 @@ const SiteLayout = ({ children }: { children: Child | undefined }) => {
 export const mainRenderer = jsxRenderer(({ children, Layout }) => {
     const c = useRequestContext();
     console.log('mainRenderer', c.req.raw.headers)
+    console.log('HAS FRONTEND', c.var.frontend)
     if ((c.req.header('hx-request') === 'true' && c.req.method === 'GET' && c.req.header('hx-target') === 'body')) {
         return (
             <SiteLayout children={children} />
